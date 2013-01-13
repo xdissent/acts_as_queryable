@@ -23,6 +23,7 @@ module Redmine
         query_class.send :queryable_class=, self
         query_class.send :available_columns=, options[:columns] if options[:columns]
         query_class.send :available_filters=, options[:filters] if options[:filters]
+        query_class.send :operators_by_filter_type=, options[:operators_by_filter_type] if options[:operators_by_filter_type]
       end
 
       module ClassMethods
