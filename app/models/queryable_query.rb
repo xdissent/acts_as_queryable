@@ -241,6 +241,21 @@ class QueryableQuery < ActiveRecord::Base
     end
   end
 
+  def add_short_filter(field, expression)
+    return unless expression
+    parms = expression.scan(/^(!\*|!|\*)?(.*)$/).first
+    add_filter field, (parms[0] || "="), [parms[1] || ""]
+  end
+
+  # Add multiple filters using +add_filter+
+  def add_filters(fields, operators, values)
+    if fields.is_a?(Array) && operators.is_a?(Hash) && (values.nil? || values.is_a?(Hash))
+      fields.each do |field|
+        add_filter(field, operators[field], values && values[field])
+      end
+    end
+  end
+
   def field_statement(field)
     v = values_for(field)
     return nil unless v.present?
