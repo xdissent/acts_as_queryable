@@ -3,7 +3,8 @@
 module QueryableHelper
 
   def operators_for_select(filter_type, query_class=nil)
-    query_class ||= @query && @query.class
+    query_class ||= @query && @query.class || self.class.read_inheritable_attribute('query_class')
+    return [] unless query_class
     query_class.operators_by_filter_type[filter_type].collect {|o| [l(query_class.operators[o]), o]}
   end
 
@@ -34,7 +35,7 @@ module QueryableHelper
 
   def query_session_key
     query_class = self.class.read_inheritable_attribute('query_class')
-    "query_#{query_class.underscore.gsub '/', '_'}"
+    "query_#{query_class.name.underscore.gsub '/', '_'}"
   end
 
   def find_query_object
