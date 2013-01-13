@@ -105,7 +105,7 @@ class QueryableQuery < ActiveRecord::Base
   end
 
   def field_blank?(field)
-    !!(values_for(field) and !values_for(field).first.blank?)
+    !(values_for(field) and !values_for(field).first.blank?)
   end
 
   def field_blank_allowed?(field)
