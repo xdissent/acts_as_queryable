@@ -14,5 +14,7 @@ Redmine::Plugin.register :acts_as_queryable do
 
   Dispatcher.to_prepare :acts_as_queryable do
     Redmine::Acts::Queryable::Patches::ActiveRecordBase.patch
+    Redmine::Acts::Queryable::Patches::ApplicationController.patch
+    # Redmine::Acts::Queryable::Patches::Issue.patch
   end
 end

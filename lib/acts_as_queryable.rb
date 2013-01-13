@@ -2,6 +2,7 @@
 
 require 'redmine/acts/queryable/patches/base'
 require 'redmine/acts/queryable/patches/active_record_base'
+require 'redmine/acts/queryable/patches/application_controller'
 
 module Redmine
   module Acts
