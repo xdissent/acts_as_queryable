@@ -79,7 +79,7 @@ class QueryableQuery < ActiveRecord::Base
   self.available_columns = []
   
   def available_columns
-    @available_columns || self.class.available_columns
+    @available_columns ||= eval_class_columns
   end
 
   #
@@ -91,7 +91,20 @@ class QueryableQuery < ActiveRecord::Base
   self.available_filters = {}
   
   def available_filters
-    @available_filters || self.class.available_filters
+    eval_class_filters
+  end
+
+  def eval_class_filters
+    Hash[self.class.available_filters.reject { |n, f| 
+        f[:if].is_a?(Proc) && !f[:if].call(self)
+      }.map { |n, f|
+        [n.to_s, f.merge(f[:values].is_a?(Proc) ? {:values => f[:values].call(self)} : {})]
+      }
+    ]
+  end
+
+  def eval_class_columns
+    self.class.available_columns.map { |c| QueryColumn.new(c[:name], c) }
   end
 
   def validate
