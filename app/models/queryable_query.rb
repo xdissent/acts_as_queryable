@@ -241,19 +241,15 @@ class QueryableQuery < ActiveRecord::Base
     end
   end
 
+  def field_statement(field)
+    v = values_for(field)
+    return nil unless v.present?
+    "(#{sql_for_field(field)})"
+  end
+
   def statement
-    # filters clauses
-    filters_clauses = []
-    filters.each_key do |field|
-      v = values_for(field).clone
-      next unless v and !v.empty?
-      operator = operator_for(field)
-      db_table = queryable_class.table_name
-      db_field = field
-      sql = '(' + sql_for_field(field, operator, v, db_table, db_field) + ')'
-      filters_clauses << sql
-    end if filters and valid?
-    filters_clauses.join(' AND ')
+    return "" unless filters and valid?
+    filters.map { |field,v| field_statement(field) }.reject { |s| s.blank? }.join(' AND ')
   end
 
   def query(options={})
@@ -272,7 +268,11 @@ class QueryableQuery < ActiveRecord::Base
   private
 
   # Helper method to generate the WHERE sql for a +field+, +operator+ and a +value+
-  def sql_for_field(field, operator, value, db_table, db_field, is_custom_filter=false)
+  def sql_for_field(field, operator=nil, value=nil, db_table=nil, db_field=nil, is_custom_filter=false)
+    operator ||= operator_for field
+    value ||= values_for field
+    db_table ||= queryable_class.table_name
+    db_field ||= field
     sql = ''
     case operator
     when "="
