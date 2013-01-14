@@ -5,7 +5,7 @@ module QueryableHelper
   def operators_for_select(filter_type, query_class=nil)
     query_class ||= @query_class || (@query && @query.class) || self.class.read_inheritable_attribute('query_class')
     return [] unless query_class
-    query_class.operators_by_filter_type[filter_type].collect {|o| [l(query_class.operators[o]), o]}
+    query_class.operators_by_filter_type[filter_type].collect {|o| [query_class.operators[o], o]}
   end
 
   def column_header(column)

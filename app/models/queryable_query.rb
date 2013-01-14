@@ -94,6 +94,10 @@ class QueryableQuery < ActiveRecord::Base
     eval_class_filters
   end
 
+  def available_filters_sorted
+    available_filters.sort { |a,b| a[1][:order] <=> b[1][:order] }
+  end
+
   def eval_class_filters
     Hash[self.class.available_filters.reject { |n, f| 
         f[:if].is_a?(Proc) && !f[:if].call(self)
@@ -240,6 +244,7 @@ class QueryableQuery < ActiveRecord::Base
   end
 
   def add_filter(field, operator, values)
+    self.filters ||= {}
     # values must be an array
     return unless values.nil? || values.is_a?(Array)
     # check if field is defined as an available filter

@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-module Redmine::Acts::Queryable
+module ActsAsQueryable
   module Patches
     module ActiveRecordBase
       extend Base
@@ -10,7 +10,7 @@ module Redmine::Acts::Queryable
       end
 
       def self.included(base)
-        base.extend ::Redmine::Acts::Queryable
+        base.extend ::ActsAsQueryable
       end
     end
   end

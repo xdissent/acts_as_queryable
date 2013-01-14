@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-module Redmine::Acts::Queryable
+module ActsAsQueryable
   module Patches
     module ApplicationController
       extend Base

@@ -13,8 +13,7 @@
 #++
 
 class QueryColumn
-  attr_accessor :name, :sortable, :groupable, :default_order
-  include Redmine::I18n
+  attr_accessor :name, :sortable, :groupable, :default_order, :caption
 
   def initialize(name, options={})
     self.name = name
@@ -24,11 +23,7 @@ class QueryColumn
       self.groupable = name.to_s
     end
     self.default_order = options[:default_order]
-    @caption_key = options[:caption] || "field_#{name}"
-  end
-
-  def caption
-    l(@caption_key)
+    self.caption = options[:caption] || name.to_s.titleize
   end
 
   # Returns true if the column is sortable, otherwise false
