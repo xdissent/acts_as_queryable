@@ -111,14 +111,14 @@ class QueryableQuery < ActiveRecord::Base
     filters.each_key do |field|
       errors.add label_for(field), :blank unless
           # filter requires one or more values
-          !field_blank?(field) or 
+          !field_blank?(field) ||
           # filter doesn't require any value
           field_blank_allowed?(field)
     end if filters
   end
 
   def field_blank?(field)
-    !(values_for(field) and !values_for(field).first.blank?)
+    !(values_for(field) && !values_for(field).first.blank?)
   end
 
   def field_blank_allowed?(field)
@@ -126,7 +126,7 @@ class QueryableQuery < ActiveRecord::Base
   end
 
   def has_filter?(field)
-    filters and filters[field]
+    filters && filters[field]
   end
 
   def type_for(field)
