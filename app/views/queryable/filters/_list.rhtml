@@ -1,0 +1,4 @@
+<span class="span_values_<%= field %>">
+  <%= select_tag "v[#{field}][]", options_for_select(query.available_values_for(field), query.values_for(field)), :class => "values_#{field}", :id => "values_#{field}_1", :multiple => (query.values_for(field) && query.values_for(field).length > 1) %>
+  <%= link_to_function "Toggle Multiple", "toggle_multi_select('values_#{field}_1');", :style => "vertical-align: bottom;" %>
+</span>

@@ -1,0 +1,3 @@
+<span class="span_values_<%= field %>"><%= text_field_tag "v[#{field}][]", query.value_for(field), :size => 10, :class => "values_#{field}", :id => "values_#{field}_1" %></span>
+<span class="span_values_<%= field %>"><%= text_field_tag "v[#{field}][]", query.value_for(field, 1), :size => 10, :class => "values_#{field}", :id => "values_#{field}_2" %></span>
+<span class="span_values_<%= field %>"><%= text_field_tag "v[#{field}][]", query.value_for(field), :size => 3, :class => "values_#{field}" %> Days</span>

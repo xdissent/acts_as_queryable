@@ -137,6 +137,10 @@ class QueryableQuery < ActiveRecord::Base
     available_filters[field][:type] if available_filters.has_key?(field)
   end
 
+  def available_values_for(field)
+    available_filters[field][:values] if available_filters.has_key?(field)
+  end
+
   def operator_for(field)
     has_filter?(field) ? filters[field][:operator] : nil
   end
@@ -377,7 +381,7 @@ class QueryableQuery < ActiveRecord::Base
     when "t"
       sql = relative_date_clause(db_table, db_field, 0, 0)
     when "w"
-      first_day_of_week = l(:general_first_day_of_week).to_i
+      first_day_of_week = 7
       day_of_week = Date.today.cwday
       days_ago = (day_of_week >= first_day_of_week ? day_of_week - first_day_of_week : day_of_week + 7 - first_day_of_week)
       sql = relative_date_clause(db_table, db_field, - days_ago, - days_ago + 6)
