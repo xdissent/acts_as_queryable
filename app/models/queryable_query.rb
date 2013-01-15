@@ -27,23 +27,23 @@ class QueryableQuery < ActiveRecord::Base
   attr_writer :operators
 
   self.operators = {
-    "="   => :label_equals,
-    "!"   => :label_not_equals,
-    "!*"  => :label_none,
-    "*"   => :label_all,
-    ">="  => :label_greater_or_equal,
-    "<="  => :label_less_or_equal,
-    "><"  => :label_between,
-    "<t+" => :label_in_less_than,
-    ">t+" => :label_in_more_than,
-    "t+"  => :label_in,
-    "t"   => :label_today,
-    "w"   => :label_this_week,
-    ">t-" => :label_less_than_ago,
-    "<t-" => :label_more_than_ago,
-    "t-"  => :label_ago,
-    "~"   => :label_contains,
-    "!~"  => :label_not_contains
+    "="   => "is",
+    "!"   => "is not",
+    "!*"  => "none",
+    "*"   => "all",
+    ">="  => ">=",
+    "<="  => "<=",
+    "><"  => "is between",
+    "<t+" => "in less than",
+    ">t+" => "in more than",
+    "t+"  => "in",
+    "t"   => "today",
+    "w"   => "this week",
+    ">t-" => "less than days ago",
+    "<t-" => "more than days ago",
+    "t-"  => "days ago",
+    "~"   => "contains",
+    "!~"  => "doesn't contain"
   }
 
   def operators
@@ -73,13 +73,17 @@ class QueryableQuery < ActiveRecord::Base
   #
   # Available Columns
   #
-  class_inheritable_array :available_columns
+  class_inheritable_hash :available_columns
   attr_writer :available_columns
 
-  self.available_columns = []
+  self.available_columns = {}
   
   def available_columns
     @available_columns ||= eval_class_columns
+  end
+
+  def eval_class_columns
+    Hash[self.class.available_columns.map { |n, c| QueryColumn.new(n.to_sym, c) }]
   end
 
   #
@@ -102,14 +106,11 @@ class QueryableQuery < ActiveRecord::Base
     Hash[self.class.available_filters.reject { |n, f| 
         f[:if].is_a?(Proc) && !f[:if].call(self)
       }.map { |n, f|
-        [n.to_s, f.merge(f[:values].is_a?(Proc) ? {:values => f[:values].call(self)} : {})]
+        [n.to_sym, f.merge(f[:values].is_a?(Proc) ? {:values => f[:values].call(self)} : {})]
       }
     ]
   end
 
-  def eval_class_columns
-    self.class.available_columns.map { |c| QueryColumn.new(c[:name], c) }
-  end
 
   def validate
     filters.each_key do |field|
@@ -154,36 +155,35 @@ class QueryableQuery < ActiveRecord::Base
   end
 
   def label_for(field)
-    label = available_filters[field][:name] if available_filters.has_key?(field)
-    label ||= field.gsub(/\_id$/, "")
+    label = available_filters[field][:label] if available_filters.has_key?(field)
+    label ||= field.gsub(/\_id$/, "").titleize
   end
 
   # Returns an array of columns that can be used to group the results
   def groupable_columns
-    available_columns.select { |c| c.groupable }
+    available_columns.select { |n, c| c.groupable }.values
   end
 
   # Returns a Hash of columns and the key for sorting
   def sortable_columns
-    available_columns.inject({}) do |h, column|
-      h[column.name.to_s] = column.sortable
-      h
-    end
+    Hash[available_columns.map { |n, c| [n, c.sortable] }]
   end
 
+  # Returns the columns (QueryColumn) to show for this query or default
   def columns
     if has_default_columns?
-      [available_columns.first]
+      default_columns
     else
       # preserve the column_names order
-      column_names.collect {|name| available_columns.find {|col| col.name == name}}.compact
+      column_names.map { |n| available_columns[n] }.compact
     end
   end
 
+  # Enforce symbols
   def column_names=(names)
     if names
-      names = names.select {|n| n.is_a?(Symbol) || !n.blank? }
-      names = names.collect {|n| n.is_a?(Symbol) ? n : n.to_sym }
+      names = names.select { |n| n.is_a?(Symbol) || !n.blank? }
+      names.map! { |n| n.to_sym }
       # Set column_names to nil if default columns
       if names.map(&:to_s) == default_columns
         names = nil
@@ -201,7 +201,7 @@ class QueryableQuery < ActiveRecord::Base
   end
 
   def default_columns
-    [available_columns.first]
+    [available_columns.first[0]]
   end
 
   def sort_criteria=(arg)
@@ -252,20 +252,15 @@ class QueryableQuery < ActiveRecord::Base
     # values must be an array
     return unless values.nil? || values.is_a?(Array)
     # check if field is defined as an available filter
-    if available_filters.has_key? field
-      filter_options = available_filters[field]
-      # check if operator is allowed for that filter
-      #if @@operators_by_filter_type[filter_options[:type]].include? operator
-      #  allowed_values = values & ([""] + (filter_options[:values] || []).collect {|val| val[1]})
-      #  filters[field] = {:operator => operator, :values => allowed_values } if (allowed_values.first and !allowed_values.first.empty?) or ["o", "c", "!*", "*", "t"].include? operator
-      #end
-      filters[field] = {:operator => operator, :values => (values || ['']) }
+    if available_filters.has_key? field.to_sym
+      # TODO: check if operator is allowed for that filter
+      filters[field.to_sym] = {:operator => operator, :values => (values || ['']) }
     end
   end
 
   def add_short_filter(field, expression)
     return unless expression
-    parms = expression.scan(/^(!\*|!|\*)?(.*)$/).first
+    parms = expression.to_s.scan(/^(!\*|!|\*)?(.*)$/).first
     add_filter field, (parms[0] || "="), [parms[1] || ""]
   end
 
