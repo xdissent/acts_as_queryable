@@ -130,7 +130,7 @@ module ActsAsQueryable::Query
         sql = "LOWER(#{table}.#{name}) NOT LIKE '%#{connection.quote_string(value.first.to_s.downcase)}%'"
       end
 
-      sql.empty? ? "(#{sql})" : ""
+      sql.empty? ? "" : "(#{sql})"
     end
   end
 end
