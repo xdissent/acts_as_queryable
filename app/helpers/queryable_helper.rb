@@ -3,10 +3,11 @@
 module QueryableHelper
   unloadable
   
-  include ActsAsQueryable::Helpers::Filters
   include ActsAsQueryable::Helpers::Scripts
+  include ActsAsQueryable::Helpers::Filters
   include ActsAsQueryable::Helpers::Columns
   include ActsAsQueryable::Helpers::GroupBy
+  include ActsAsQueryable::Helpers::Sort
 
   def column_header(column)
     if column.sortable
@@ -58,10 +59,13 @@ module QueryableHelper
         end
         @query.group_by = params[:group_by]
         @query.columns = params[:c] || (params[:query] && params[:query][:columns])
-        session[query_session_key] = {:filters => @query.filters, :group_by => @query.group_by, :columns => @query.columns}
+        @query.sort_criteria = (params[:query] && params[:query][:sort_criteria])
+        session[query_session_key] = {:filters => @query.filters, :group_by => @query.group_by, :columns => @query.columns, :sort_criteria => @query.sort_criteria}
       else
-        @query = @query_class.find_by_id(session[query_session_key][:id]) if session[query_session_key][:id]
-        @query ||= @query_class.new(session[query_session_key].merge :id => nil, :name => "_")
+        attrs = session[query_session_key].dup
+        @query = @query_class.find_by_id(attrs[:id]) if attrs[:id]
+        attrs.delete :id
+        @query ||= @query_class.new(attrs.merge :name => "_")
       end
     end
   end

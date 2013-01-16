@@ -14,16 +14,5 @@ module ActsAsQueryable::Query
     def grouped?
       column_available?(group_by) && groupable_for(group_by)
     end
-
-    # Returns the SQL sort order that should be prepended for grouping
-    def group_by_sort_order
-      return nil unless grouped?
-      sortable = sortable_for(group_by)
-      # If sortable is a boolean true, use the queryable class field with the same name.
-      sortable = "#{self.queryable_class.table_name}.#{group_by}" if sortable == true
-      sortable.is_a?(Array) ?
-        sortable.collect { |s| "#{s} #{default_order_for(group_by)}" }.join(',') :
-        "#{sortable} #{default_order_for(group_by)}"
-    end
   end
 end

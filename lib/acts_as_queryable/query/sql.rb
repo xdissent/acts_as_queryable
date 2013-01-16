@@ -3,17 +3,17 @@
 module ActsAsQueryable::Query
   module Sql
   
-    def sql
+    def to_sql
       return nil unless filters.present? and valid?
       filters.map { |n, f| sql_for(n) }.reject { |s| s.blank? }.join(' AND ')
     end
 
     def query(options={})
-      order_option = [group_by_sort_order, options[:order]].reject { |s| s.blank? }.join(',')
+      order_option = [group_by_clause, sort_criteria_clause, options[:order]].reject { |s| s.blank? }.join(',')
       order_option = nil if order_option.blank?
       queryable_class.find :all, 
         :include => (options[:include] || []).uniq,
-        :conditions => self.class.merge_conditions(sql, options[:conditions]),
+        :conditions => self.class.merge_conditions(to_sql, options[:conditions]),
         :order => order_option,
         :limit => options[:limit],
         :offset => options[:offset]
@@ -22,6 +22,25 @@ module ActsAsQueryable::Query
     end
 
   private
+    def sort_criteria_clause
+      return nil unless sort_criteria.present?
+      sort_criteria.reverse.map { |name, order| order_clause name, order }.join(',')
+    end
+
+    def order_clause(name, order)
+      # Translate name to sortable (true, String table name and field, or array of table names and fields)
+      sortable = sortable_for(name)
+      return nil unless sortable
+      # Translate true into field name column the the queryable class table.
+      sortable = "#{self.queryable_class.table_name}.#{name}" if sortable == true
+      # Force to array and join
+      Array(sortable).map { |s| "#{s} #{order}" }.join(',')
+    end
+
+    def group_by_clause
+      return nil unless grouped?
+      order_clause group_by, (default_order_for(group_by) || 'asc')
+    end
 
     # Returns a SQL clause for a date or datetime field.
     def date_clause(table, field, from, to)
@@ -111,7 +130,7 @@ module ActsAsQueryable::Query
         sql = "LOWER(#{table}.#{name}) NOT LIKE '%#{connection.quote_string(value.first.to_s.downcase)}%'"
       end
 
-      sql ? "(#{sql})" : ""
+      sql.empty? ? "(#{sql})" : ""
     end
   end
 end

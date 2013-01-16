@@ -11,7 +11,7 @@ module ActsAsQueryable::Helpers
     def query_group_by(query=nil)
       query ||= @query
       content_tag :div, (query_group_by_label(query) +
-        query_group_by_select(query)), :class => "asdf"
+        query_group_by_select(query)), :class => "query-group-by"
     end
 
     # Public: Build a label for the group_by select.
