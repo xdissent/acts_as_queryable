@@ -21,6 +21,32 @@ module ActsAsQueryable::Query
       raise StatementInvalid.new(e.message)
     end
 
+    def count(options={})
+      queryable_class.count :include => (options[:include] || []).uniq, 
+        :conditions => self.class.merge_conditions(to_sql, options[:conditions])
+    rescue ::ActiveRecord::StatementInvalid => e
+      raise StatementInvalid.new(e.message)
+    end
+
+    def count_by_group(options={})
+      return {nil => count(options)} unless grouped?
+      begin
+        # Rails will raise an (unexpected) RecordNotFound if there's only a nil group value
+        r = queryable_class.count :group => group_by_clause, 
+          :include => (options[:include] || []).uniq, 
+          :conditions => self.class.merge_conditions(to_sql, options[:conditions])
+      rescue ActiveRecord::RecordNotFound
+        r = {nil => count(options)}
+      end
+      c = group_by_column
+      if c.is_a?(QueryCustomFieldColumn)
+        r = r.keys.inject({}) {|h, k| h[c.custom_field.cast_value(k)] = r[k]; h}
+      end
+      r
+    rescue ::ActiveRecord::StatementInvalid => e
+      raise StatementInvalid.new(e.message)
+    end
+
   private
 
     def sort_criteria_clause
