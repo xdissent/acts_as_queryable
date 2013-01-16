@@ -3,9 +3,10 @@
 module QueryableHelper
   unloadable
   
-  include QueryableFiltersHelper
-  include QueryableScriptsHelper
-  include QueryableColumnsHelper
+  include ActsAsQueryable::Helpers::Filters
+  include ActsAsQueryable::Helpers::Scripts
+  include ActsAsQueryable::Helpers::Columns
+  include ActsAsQueryable::Helpers::GroupBy
 
   def column_header(column)
     if column.sortable
