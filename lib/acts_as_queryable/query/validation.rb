@@ -48,10 +48,12 @@ module ActsAsQueryable::Query
     # Public: Determines if a filter's values are blank.
     #
     # name - The filter name as a Symbol.
+    # values - Values to check for blankness or nil for current filter values.
     #
     # Returns a boolean indicating whether the filter's values are blank.
-    def values_blank?(name)
-      values_for(name).blank? || values_for(name).first.blank?
+    def values_blank?(name, values=nil)
+      values ||= values_for(name)
+      values.blank? || values.first.blank?
     end
 
     # Public: Determines if a filter's values are allowed to be blank.
