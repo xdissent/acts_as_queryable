@@ -10,6 +10,7 @@ module QueryableScriptsHelper
     return if @queryable_scripted
     @queryable_scripted = true
     concat javascript_include_tag("prototype")
+    concat javascript_include_tag("select_list_move")
     concat javascript_include_tag("filters", :plugin => :acts_as_queryable)
     concat javascript_include_tag("columns", :plugin => :acts_as_queryable)
   end

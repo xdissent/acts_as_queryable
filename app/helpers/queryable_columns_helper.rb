@@ -28,7 +28,7 @@ module QueryableColumnsHelper
 
   def query_columns_available_options(query=nil)
     query ||= @query
-    (query.available_columns - query.columns).map { |column| [column.caption, column.name] }
+    (query.available_columns.keys - query.columns).map { |n| [query.column_label_for(n), n] }
   end
 
   def query_columns_available_buttons
@@ -51,16 +51,17 @@ module QueryableColumnsHelper
     select_tag("c[]",
       options_for_select(query_columns_selected_options(query)),
       :multiple => true, 
+      :id => 'selected_columns',
       :size => 10)
   end
 
   def query_columns_selected_options(query=nil)
     query ||= @query
-    query.columns.map { |column| [column.caption, column.name] }
+    query.columns.map { |n| [query.column_label_for(n), n] }
   end
 
   def query_columns_selected_buttons
-    (content_tag(:button, "&#8593;", :onclick => "moveOptionsUp(this.form.selected_columns);") +
-      content_tag(:button, "&#8595;", :onclick => "moveOptionsDown(this.form.selected_columns);"))
+    (content_tag(:button, "&#8593;", :onclick => "moveOptionUp(this.form.selected_columns);") +
+      content_tag(:button, "&#8595;", :onclick => "moveOptionDown(this.form.selected_columns);"))
   end
 end

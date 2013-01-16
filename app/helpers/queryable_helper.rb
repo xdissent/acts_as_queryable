@@ -37,11 +37,11 @@ module QueryableHelper
   end
 
   def find_query_object
-    @query_class ||= self.class.read_inheritable_attribute('query_class')
+    @query_class ||= self.class.read_inheritable_attribute :query_class
     return unless @query_class
 
     if !params[:query_id].blank?
-      @query = @query_class.find_by_id(params[:query_id])
+      @query = @query_class.find_by_id params[:query_id]
       return unless @query
       session[query_session_key] = {:id => @query.id}
     else
@@ -51,13 +51,13 @@ module QueryableHelper
           @query.filters = {}
           @query.add_filters(params[:fields] || params[:f], params[:operators] || params[:op], params[:values] || params[:v])
         else
-          @query.available_filters.keys.each do |field|
-            @query.add_short_filter(field, params[field]) if params[field]
+          @query.available_filters.each_key do |name|
+            @query.add_short_filter(name, params[name]) if params[name]
           end
         end
         @query.group_by = params[:group_by]
-        @query.column_names = params[:c] || (params[:query] && params[:query][:column_names])
-        session[query_session_key] = {:filters => @query.filters, :group_by => @query.group_by, :column_names => @query.column_names}
+        @query.columns = params[:c] || (params[:query] && params[:query][:columns])
+        session[query_session_key] = {:filters => @query.filters, :group_by => @query.group_by, :columns => @query.columns}
       else
         @query = @query_class.find_by_id(session[query_session_key][:id]) if session[query_session_key][:id]
         @query ||= @query_class.new(session[query_session_key].merge :id => nil, :name => "_")

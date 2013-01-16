@@ -5,20 +5,19 @@
   <tr>
     <td>
       <table>
-        <% query.available_filters_sorted.map do |filter| %>
-          <% field = filter[0] %>
-          <tr id="tr_<%= field %>" class="filter" style="<%= "display: none;" unless query.has_filter?(field) %>">
+        <% query.available_filters_sorted.each do |name, filter| %>
+          <tr id="tr_<%= name %>" class="filter" style="<%= "display: none;" unless query.has_filter?(name) %>">
             <td class="name">
-              <%= query_filter_name field, query %>
+              <%= query_filter_name name, query %>
             </td>
             <td class="operator">
-              <%= query_filter_operator field, query %>
+              <%= query_filter_operator name, query %>
             </td>
             <td class="values">
-              <div id="div_values_<%= field %>" style="display:none;">
-                <%= query_filter_values field, query %>
+              <div id="div_values_<%= name %>" style="display:none;">
+                <%= query_filter_values name, query %>
               </div>
-              <script type="text/javascript">toggle_filter('<%= field %>');</script>
+              <script type="text/javascript">toggle_filter('<%= name %>');</script>
             </td>
           </tr>
         <% end %>
