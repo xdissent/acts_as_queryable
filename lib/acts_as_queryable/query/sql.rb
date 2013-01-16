@@ -71,6 +71,12 @@ module ActsAsQueryable::Query
       when "="
         if [:date, :date_past].include?(type)
           sql = date_clause(table, name, (Date.parse(value.first) rescue nil), (Date.parse(value.first) rescue nil))
+        elsif type == :boolean
+          if value.first.to_i == 0
+            sql = "#{table}.#{name} = #{connection.quoted_false}"
+          else
+            sql = "#{table}.#{name} = #{connection.quoted_true}"
+          end
         else
           if value.any?
             sql = "#{table}.#{name} IN (" + value.collect{|val| "'#{connection.quote_string(val)}'"}.join(",") + ")"
