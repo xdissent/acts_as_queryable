@@ -8,9 +8,11 @@ module ActsAsQueryable::Query
     end
 
     def sort_criteria=(arg)
-      arg = arg.keys.sort.map { |k| arg[k] } if arg.is_a?(Hash)
-      c = arg.select { |k,o| k.to_s.present? }.slice(0, 3).map {|k,o| [k.to_s, o.to_s == 'desc' ? o.to_s : 'asc'] }
-      self[:sort_criteria] = c
+      if arg.is_a?(Enumerable)
+        arg = arg.keys.sort.map { |k| arg[k] } if arg.is_a?(Hash)
+        arg = arg.select { |k, o| k.to_s.present? }.slice(0, 3).map { |k, o| [k.to_s.to_sym, o.to_s == 'desc' ? o.to_s : 'asc'] }
+      end
+      self[:sort_criteria] = arg
     end
 
     def sort_criteria_key(arg)

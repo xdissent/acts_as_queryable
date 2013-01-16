@@ -20,10 +20,10 @@ module ActsAsQueryable::Query
       return nil unless grouped?
       sortable = sortable_for(group_by)
       # If sortable is a boolean true, use the queryable class field with the same name.
-      sortable = "#{self.queryable_class.table_name}.#{name}" if sortable == true
+      sortable = "#{self.queryable_class.table_name}.#{group_by}" if sortable == true
       sortable.is_a?(Array) ?
-        sortable.collect { |s| "#{s} #{default_order_for(name)}" }.join(',') :
-        "#{sortable} #{default_order_for(name)}"
+        sortable.collect { |s| "#{s} #{default_order_for(group_by)}" }.join(',') :
+        "#{sortable} #{default_order_for(group_by)}"
     end
   end
 end
