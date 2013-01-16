@@ -17,6 +17,7 @@ class QueryableQuery < ActiveRecord::Base
 
   validates_presence_of :name, :on => :save
   validates_length_of :name, :maximum => 255
+  validate :validate_filters, :validate_columns, :validate_group_by
 
   # Queryable class/instance accessors
   class_inheritable_accessor :queryable_class
@@ -52,7 +53,8 @@ class QueryableQuery < ActiveRecord::Base
     :date_past =>     [ "=", ">=", "<=", "><", ">t-", "<t-", "t-", "t", "w" ],
     :string =>        [ "=", "~", "!", "!~" ],
     :text =>          [ "~", "!~" ],
-    :integer =>       [ "=", ">=", "<=", "!*", "*" ]
+    :integer =>       [ "=", ">=", "<=", "!*", "*" ],
+    :boolean =>       [ "=" ]
   }
 
   self.available_columns = {}
