@@ -41,6 +41,10 @@ module ActsAsQueryable::Query
       [available_columns.keys.first].compact
     end
 
+    def groupable_columns
+      available_columns.map { |n, c| n if c[:groupable] }.compact
+    end
+
     # Public: Return an available query column's defintion by name,
     # or an empty Hash.
     #
