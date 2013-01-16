@@ -67,4 +67,5 @@ require 'acts_as_queryable/helpers/columns'
 require 'acts_as_queryable/helpers/group_by'
 require 'acts_as_queryable/helpers/sort'
 require 'acts_as_queryable/helpers/list'
+require 'acts_as_queryable/helpers/form'
 

@@ -9,8 +9,13 @@ module ActsAsQueryable::Patches
     end
 
     module ClassMethods
-      def query_class(klass)
-        write_inheritable_attribute :query_class, klass
+      def queryable(klass=nil, filter_options={})
+        klass ||= name.sub("Controller", "").singularize.constantize
+        return unless klass.queryable?
+        write_inheritable_attribute :queryable, klass
+        include ::QueryableHelper
+        helper :queryable
+        before_filter :find_query, filter_options
       end
     end
   end
