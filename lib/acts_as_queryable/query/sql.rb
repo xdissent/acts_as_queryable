@@ -22,6 +22,7 @@ module ActsAsQueryable::Query
     end
 
   private
+
     def sort_criteria_clause
       return nil unless sort_criteria.present?
       sort_criteria.reverse.map { |name, order| order_clause name, order }.join(',')
@@ -59,12 +60,12 @@ module ActsAsQueryable::Query
     end
 
     # Helper method to generate the WHERE sql for a +field+, +operator+ and a +value+
-    def sql_for(name)
-      return "" if values_blank?(name)
+    def sql_for(name, value=nil, type=nil, table=nil)
+      return if values_blank?(name)
 
-      value = values_for(name)
-      type = type_for(name)
-      table = queryable_class.table_name
+      value ||= values_for(name)
+      type ||= type_for(name)
+      table ||= queryable_class.table_name
       sql = nil
 
       case operator_for(name)
@@ -139,7 +140,7 @@ module ActsAsQueryable::Query
         sql = "LOWER(#{table}.#{name}) NOT LIKE '%#{connection.quote_string(value.first.to_s.downcase)}%'"
       end
 
-      sql.empty? ? "" : "(#{sql})"
+      sql.empty? ? nil : "(#{sql})"
     end
   end
 end
