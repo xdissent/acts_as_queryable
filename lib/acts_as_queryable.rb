@@ -61,8 +61,10 @@ require 'acts_as_queryable/query/sort'
 require 'acts_as_queryable/query/sql'
 require 'acts_as_queryable/query/validation'
 
+require 'acts_as_queryable/helpers/scripts'
 require 'acts_as_queryable/helpers/filters'
 require 'acts_as_queryable/helpers/columns'
 require 'acts_as_queryable/helpers/group_by'
 require 'acts_as_queryable/helpers/sort'
-require 'acts_as_queryable/helpers/scripts'
+require 'acts_as_queryable/helpers/list'
+

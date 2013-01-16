@@ -8,6 +8,7 @@ module QueryableHelper
   include ActsAsQueryable::Helpers::Columns
   include ActsAsQueryable::Helpers::GroupBy
   include ActsAsQueryable::Helpers::Sort
+  include ActsAsQueryable::Helpers::List
 
   def column_header(column)
     if column.sortable
