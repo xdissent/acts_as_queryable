@@ -49,14 +49,14 @@ module ActsAsQueryable::Helpers
     def query_list_item_value_content(value, name, item, query=nil)
       query ||= @query
       case value.class.name
-      when 'Time'
+      when "Time"
         format_time(value)
-      when 'Date'
+      when "Date"
         format_date(value)
-      when 'TrueClass'
-        "Yes"
-      when 'FalseClass'
-        "No"
+      when "TrueClass"
+        qt(:yes)
+      when "FalseClass"
+        qt(:no)
       else
         h(value.to_s)
       end
@@ -65,7 +65,7 @@ module ActsAsQueryable::Helpers
     def query_list_group_row(value, item, query=nil)
       query ||= @query
       content = query_list_item_value_content(value, query.group_by, item, query)
-      row = content_tag :td, "Gouped by #{query.group_by}: #{content}", :colspan => query.columns.size
+      row = content_tag :td, "#{query.column_label_for(query.group_by)}: #{content}", :colspan => query.columns.size
       content_tag :tr, row
     end
   end

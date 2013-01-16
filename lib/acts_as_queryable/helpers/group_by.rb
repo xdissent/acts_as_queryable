@@ -21,7 +21,7 @@ module ActsAsQueryable::Helpers
     #
     # Returns the label tag as a String.
     def query_group_by_label(query=nil)
-      label_tag "group_by", "Group By"
+      label_tag "group_by", qt(:group_by)
     end
 
     # Public: Build a select tag with groupable columns.
@@ -31,7 +31,7 @@ module ActsAsQueryable::Helpers
     # Returns the select tag as a String.
     def query_group_by_select(query=nil)
       query ||= @query
-      select_tag 'group_by', 
+      select_tag "group_by", 
         options_for_select(query_group_by_options(query), query.group_by)
     end
 
@@ -42,7 +42,7 @@ module ActsAsQueryable::Helpers
     # Returns the select tag as a String.
     def query_group_by_options(query=nil)
       query ||= @query
-      [["",""]] + query.groupable_columns.map { |c| [query.column_label_for(c), c] }
+      [["", ""]] + query.groupable_columns.map { |c| [query.column_label_for(c), c] }
     end
   end
 end

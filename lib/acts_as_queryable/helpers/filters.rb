@@ -21,7 +21,7 @@ module ActsAsQueryable::Helpers
     # Returns the widget as a String.
     def query_filter_name(name, query=nil)
       query ||= @query
-      (check_box_tag('f[]', name, query.has_filter?(name), :onclick => "toggle_filter('#{name}');", :id => "cb_#{name}") +
+      (check_box_tag("f[]", name, query.has_filter?(name), :onclick => "toggle_filter('#{name}');", :id => "cb_#{name}") +
         label_tag("cb_#{name}", query.filter_label_for(name)))
     end
 
@@ -59,7 +59,7 @@ module ActsAsQueryable::Helpers
     #
     # Returns the label tag as a String.
     def query_filter_operator_label(name, query=nil)
-      label_tag "operators_#{name}", "Operator"
+      label_tag "operators_#{name}", qt(:operator)
     end
 
     # Public: Build a select tag with operators for a filter field.
@@ -85,7 +85,7 @@ module ActsAsQueryable::Helpers
     # Returns the select options as an Array.
     def query_filter_operator_options(name, query=nil)
       query ||= @query
-      query.operators_for(name).map { |o| [query.operators[o], o] }
+      query.operators_for(name).map { |o| [query.operator_label_for(query.operators[o]), o] }
     end
 
     # Public: Build a field name selection widget for adding a new filter.
@@ -105,7 +105,7 @@ module ActsAsQueryable::Helpers
     #
     # Returns the label tag as a String.
     def query_filter_add_label(query=nil)
-      label_tag "add_filter_select", "Add Filter"
+      label_tag "add_filter_select", qt(:add_filter)
     end
 
     # Public: Build a select tag with available fields for a new filter.
@@ -115,7 +115,7 @@ module ActsAsQueryable::Helpers
     # Returns the select tag as a String.
     def query_filter_add_select(query=nil)
       query ||= @query
-      select_tag 'add_filter_select', 
+      select_tag "add_filter_select", 
           options_for_select(query_filter_add_options(query)),
           :onchange => "add_filter();",
           :name => nil
@@ -128,7 +128,7 @@ module ActsAsQueryable::Helpers
     # Returns the select tag as a String.
     def query_filter_add_options(query=nil)
       query ||= @query
-      [["Select Filter",""]] + query.available_filters_sorted.map do |n, f| 
+      [[qt(:select_filter), ""]] + query.available_filters_sorted.map do |n, f| 
         [query.filter_label_for(n), n] unless query.has_filter?(n)
       end.compact
     end

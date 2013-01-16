@@ -24,5 +24,10 @@ module ActsAsQueryable::Query
     def operators_for(name)
       operators_by_filter_type[type_for(name)] || []
     end
+
+    # Operator labels get humanize rather than titleize.
+    def operator_label_for(name)
+      label_for name, :default => name.to_s.humanize.downcase
+    end
   end
 end

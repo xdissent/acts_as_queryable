@@ -15,7 +15,7 @@ module ActsAsQueryable::Helpers
     end
 
     def query_columns_available_label(query=nil)
-      label_tag "available_columns", "Available Columns"
+      label_tag "available_columns", qt(:available_columns)
     end
 
     def query_columns_available_select(query=nil)
@@ -43,7 +43,7 @@ module ActsAsQueryable::Helpers
     end
 
     def query_columns_selected_label(query=nil)
-      label_tag "selected_columns", "Selected Columns"
+      label_tag "selected_columns", qt(:selected_columns)
     end
 
     def query_columns_selected_select(query=nil)

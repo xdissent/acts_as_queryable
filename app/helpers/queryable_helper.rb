@@ -48,4 +48,9 @@ module QueryableHelper
       end
     end
   end
+
+  # All translations run through here.
+  def qt(label, *args)
+    t(label, :default => label.to_s.titleize)
+  end
 end

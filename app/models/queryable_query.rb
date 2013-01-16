@@ -26,23 +26,23 @@ class QueryableQuery < ActiveRecord::Base
 
   # Default operators
   self.operators = {
-    "="   => "is",
-    "!"   => "is not",
-    "!*"  => "none",
-    "*"   => "all",
-    ">="  => ">=",
-    "<="  => "<=",
-    "><"  => "is between",
-    "<t+" => "in less than",
-    ">t+" => "in more than",
-    "t+"  => "in",
-    "t"   => "today",
-    "w"   => "this week",
-    ">t-" => "less than days ago",
-    "<t-" => "more than days ago",
-    "t-"  => "days ago",
-    "~"   => "contains",
-    "!~"  => "doesn't contain"
+    "="   => :is,
+    "!"   => :is_not,
+    "!*"  => :none,
+    "*"   => :all,
+    ">="  => :greater_than_equal,
+    "<="  => :less_than_equal,
+    "><"  => :is_between,
+    "<t+" => :in_less_than,
+    ">t+" => :in_more_than,
+    "t+"  => :in,
+    "t"   => :today,
+    "w"   => :this_week,
+    ">t-" => :less_than_days_ago,
+    "<t-" => :more_than_days_ago,
+    "t-"  => :days_ago,
+    "~"   => :contains,
+    "!~"  => :does_not_contain
   }
 
   # Default operators by filter type
@@ -68,7 +68,7 @@ class QueryableQuery < ActiveRecord::Base
     @queryable_class || self.class.queryable_class
   end
 
-  def label_for(name)
-    name.to_s.titleize
+  def label_for(name, options={})
+    I18n.t(name, {:default => name.to_s.titleize}.merge(options))
   end
 end
