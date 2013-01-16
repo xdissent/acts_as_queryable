@@ -30,6 +30,9 @@ module ActsAsQueryable::Query
     def order_clause(name, order)
       # Translate name to sortable (true, String table name and field, or array of table names and fields)
       sortable = sortable_for(name)
+      # Force valid sortable value for group_by.
+      sortable ||= true if group_by == name
+      # Bail if we don't have anything to sort on.
       return nil unless sortable
       # Translate true into field name column the the queryable class table.
       sortable = "#{self.queryable_class.table_name}.#{name}" if sortable == true
