@@ -9,38 +9,16 @@ module QueryableHelper
   include ActsAsQueryable::Helpers::GroupBy
   include ActsAsQueryable::Helpers::Sort
   include ActsAsQueryable::Helpers::List
-
-  def column_header(column)
-    if column.sortable
-      sort_header_tag column.name.to_s, :caption => column.caption, 
-        :default_order => column.default_order
-    else
-      content_tag 'th', h(column.caption)
-    end
-  end
-
-  def column_content(column, queryable)
-    value = column.value(queryable)
-    case value.class.name
-    when 'Time'
-      format_time(value)
-    when 'Date'
-      format_date(value)
-    when 'TrueClass'
-      "Yes"
-    when 'FalseClass'
-      "No"
-    else
-      h(value.to_s)
-    end
-  end
+  include ActsAsQueryable::Helpers::Form
 
   def query_session_key
     "query_#{@query_class.name.underscore.gsub '/', '_'}"
   end
 
-  def find_query_object
-    @query_class ||= self.class.read_inheritable_attribute :query_class
+  def find_query
+    @queryable_class = self.class.read_inheritable_attribute :queryable
+    return unless @queryable_class && @queryable_class.queryable?
+    @query_class ||= @queryable_class.query_class
     return unless @query_class
 
     if !params[:query_id].blank?
