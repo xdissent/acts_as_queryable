@@ -57,7 +57,7 @@ module ActsAsQueryable::Query
 
     def sort_criteria_clause
       return nil unless sort_criteria.present?
-      sort_criteria.reverse.map { |name, order| order_clause name, order }.join(',')
+      sort_criteria.reverse.map { |name, order| order_clause name, order }.reject { |s| s.blank? }.join(',')
     end
 
     def order_clause(name, order)
@@ -70,7 +70,7 @@ module ActsAsQueryable::Query
       # Translate true into field name column the the queryable class table.
       sortable = "#{self.queryable_class.table_name}.#{name}" if sortable == true
       # Force to array and join
-      Array(sortable).map { |s| "#{s} #{order}" }.join(',')
+      Array(sortable).map { |s| "#{s} #{order}" }.reject { |s| s.blank? }.join(',')
     end
 
     # Returns a SQL clause for a date or datetime field.
