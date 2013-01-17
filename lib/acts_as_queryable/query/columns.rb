@@ -47,6 +47,10 @@ module ActsAsQueryable::Query
       [available_columns.keys.first].compact
     end
 
+    def has_default_columns?
+      self[:columns].blank?
+    end
+
     def groupable_columns
       available_columns.map { |n, c| n if c[:groupable] }.compact
     end
