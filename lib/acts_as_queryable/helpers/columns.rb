@@ -32,8 +32,8 @@ module ActsAsQueryable::Helpers
     end
 
     def query_columns_available_buttons
-      (content_tag(:button, "&#8594;", :type => :button, :onclick => "moveOptions(this.form.available_columns, this.form.selected_columns);") +
-        content_tag(:button, "&#8592;", :onclick => "moveOptions(this.form.selected_columns, this.form.available_columns);"))
+      (content_tag(:button, "&#8594;", :type => :button, :onclick => "moveOptions(this.form.available_columns, this.form.selected_columns); return false;") +
+        content_tag(:button, "&#8592;", :onclick => "moveOptions(this.form.selected_columns, this.form.available_columns); return false;"))
     end
 
     def query_columns_selected(query=nil)
@@ -61,8 +61,8 @@ module ActsAsQueryable::Helpers
     end
 
     def query_columns_selected_buttons
-      (content_tag(:button, "&#8593;", :onclick => "moveOptionUp(this.form.selected_columns);") +
-        content_tag(:button, "&#8595;", :onclick => "moveOptionDown(this.form.selected_columns);"))
+      (content_tag(:button, "&#8593;", :onclick => "moveOptionUp(this.form.selected_columns); return false;") +
+        content_tag(:button, "&#8595;", :onclick => "moveOptionDown(this.form.selected_columns); return false;"))
     end
   end
 end
