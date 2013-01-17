@@ -1,23 +1,23 @@
-<%= query_filter_scripts query %>
-<table style="width:100%">
+<% query_scripts %>
+<% query_styles %>
+
+<table class="query-filters">
   <tr>
     <td>
       <table>
-        <% query.available_filters_sorted.map do |filter| %>
-          <% field = filter[0] %>
-          <tr id="tr_<%= field %>" class="filter" style="<%= "display: none;" unless query.has_filter?(field) %>">
-            <td style="width: 200px;">
-              <%= check_box_tag 'f[]', field, query.has_filter?(field), :onclick => "toggle_filter('#{field}');", :id => "cb_#{field}" %>
-              <%= label_tag "cb_#{field}", query.label_for(field) %>
+        <% query.available_filters_sorted.each do |name, filter| %>
+          <tr id="tr_<%= name %>" class="filter" style="<%= "display: none;" unless query.has_filter?(name) %>">
+            <td class="name">
+              <%= query_filter_name name, query %>
             </td>
-            <td style="width: 150px;">
-              <%= query_filter_operators_for field, query %>
+            <td class="operator">
+              <%= query_filter_operator name, query %>
             </td>
-            <td>
-              <div id="div_values_<%= field %>" style="display:none;">
-                <%= query_filter_fields_for field, query %>
+            <td class="values">
+              <div id="div_values_<%= name %>" style="display:none;">
+                <%= query_filter_values name, query %>
               </div>
-              <script type="text/javascript">toggle_filter('<%= field %>');</script>
+              <script type="text/javascript">toggle_filter('<%= name %>');</script>
             </td>
           </tr>
         <% end %>

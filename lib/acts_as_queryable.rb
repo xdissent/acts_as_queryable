@@ -1,9 +1,5 @@
 # encoding: utf-8
 
-require 'acts_as_queryable/patches/base'
-require 'acts_as_queryable/patches/active_record_base'
-require 'acts_as_queryable/patches/application_controller'
-
 module ActsAsQueryable
   def queryable?
     false
@@ -47,4 +43,29 @@ module ActsAsQueryable
       self.class.query_class
     end
   end
+
+  module Query
+    class StatementInvalid < ActiveRecord::StatementInvalid; end
+  end
 end
+
+require 'acts_as_queryable/patches/base'
+require 'acts_as_queryable/patches/active_record_base'
+require 'acts_as_queryable/patches/application_controller'
+
+require 'acts_as_queryable/query/filters'
+require 'acts_as_queryable/query/columns'
+require 'acts_as_queryable/query/operators'
+require 'acts_as_queryable/query/group_by'
+require 'acts_as_queryable/query/sort'
+require 'acts_as_queryable/query/sql'
+require 'acts_as_queryable/query/validation'
+
+require 'acts_as_queryable/helpers/scripts'
+require 'acts_as_queryable/helpers/filters'
+require 'acts_as_queryable/helpers/columns'
+require 'acts_as_queryable/helpers/group_by'
+require 'acts_as_queryable/helpers/sort'
+require 'acts_as_queryable/helpers/list'
+require 'acts_as_queryable/helpers/form'
+

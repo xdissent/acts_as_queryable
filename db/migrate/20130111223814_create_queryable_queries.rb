@@ -5,7 +5,7 @@ class CreateQueryableQueries < ActiveRecord::Migration
     create_table :queryable_queries do |t|
       t.string :name, :default => "", :null => false
       t.text :filters
-      t.text :column_names
+      t.text :columns
       t.text :sort_criteria
       t.string :group_by
       t.string :type

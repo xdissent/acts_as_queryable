@@ -1,0 +1,34 @@
+.query-filters {
+  width: 100%;
+}
+
+.query-filters td.add-filter {
+  text-align: right;
+  vertical-align: top;
+}
+
+.query-filters .filter .name {
+  width:200px;
+}
+
+.query-filters .filter .operator {
+  width: 200px;
+}
+
+.query-filters .filter .operator select {
+  vertical-align: top;
+}
+
+.query-filters .filter .values {
+  width: 150px;
+}
+
+.query-filters .filter .operator label {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
