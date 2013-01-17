@@ -9,10 +9,10 @@ module ActsAsQueryable::Query
     end
 
     def query(options={})
-      order_option = [group_by_clause, sort_criteria_clause, options[:order]].reject { |s| s.blank? }.join(',')
+      order_option = [group_by_sort_clause, sort_criteria_clause, options[:order]].reject { |s| s.blank? }.join(',')
       order_option = nil if order_option.blank?
       queryable_class.find :all, 
-        :include => (options[:include] || []).uniq,
+        :include => (options[:include] || []),
         :conditions => self.class.merge_conditions(to_sql, options[:conditions]),
         :order => order_option,
         :limit => options[:limit],
@@ -22,7 +22,7 @@ module ActsAsQueryable::Query
     end
 
     def count(options={})
-      queryable_class.count :include => (options[:include] || []).uniq, 
+      queryable_class.count :include => (options[:include] || []), 
         :conditions => self.class.merge_conditions(to_sql, options[:conditions])
     rescue ::ActiveRecord::StatementInvalid => e
       raise StatementInvalid.new(e.message)
@@ -32,10 +32,8 @@ module ActsAsQueryable::Query
       return {nil => count(options)} unless grouped?
       begin
         # Rails will raise an (unexpected) RecordNotFound if there's only a nil group value
-        groupable = groupable_for(group_by)
-        gb = "#{self.queryable_class.table_name}.#{group_by}" if groupable == true
-        r = queryable_class.count :group => gb, 
-          :include => (options[:include] || []).uniq, 
+        r = queryable_class.count :group => group_by_clause, 
+          :include => (options[:include] || [group_by]), 
           :conditions => self.class.merge_conditions(to_sql, options[:conditions])
       rescue ActiveRecord::RecordNotFound
         r = {nil => count(options)}
@@ -45,7 +43,17 @@ module ActsAsQueryable::Query
       raise StatementInvalid.new(e.message)
     end
 
-  private
+    def group_by_clause
+      return nil unless grouped?
+      groupable = groupable_for(group_by)
+      groupable = group_by.to_s if groupable == true
+      groupable
+    end
+
+    def group_by_sort_clause
+      return nil unless grouped?
+      order_clause group_by, (default_order_for(group_by) || 'asc')
+    end
 
     def sort_criteria_clause
       return nil unless sort_criteria.present?
@@ -65,11 +73,6 @@ module ActsAsQueryable::Query
       Array(sortable).map { |s| "#{s} #{order}" }.join(',')
     end
 
-    def group_by_clause
-      return nil unless grouped?
-      order_clause group_by, (default_order_for(group_by) || 'asc')
-    end
-
     # Returns a SQL clause for a date or datetime field.
     def date_clause(table, field, from, to)
       s = []
@@ -86,7 +89,7 @@ module ActsAsQueryable::Query
     # Helper method to generate the WHERE sql for a +field+, +operator+ and a +value+
     def sql_for(name, operator=nil, values=nil, table=nil, field=nil, type=nil)
       values ||= values_for(name)
-      return if values_blank?(name, values)
+      # return if values_blank?(name, values)
       type ||= type_for(name)
       table ||= queryable_class.table_name
       operator ||= operator_for(name)
