@@ -10,12 +10,18 @@ module ActsAsQueryable::Query
     def columns=(names)
       # Only accept enumerable objects.
       if names.is_a?(Enumerable)
-        # Filter out non-symbols and blank values.
-        names = names.select { |n| n.is_a?(Symbol) || !n.blank? }
-        # Enforce symbols
-        names.map! { |n| n.to_s.to_sym }
+        names = names.map do |name|
+          # Filter out non-symbols and blank values.
+          if name.is_a?(Symbol) || !name.blank?
+            # Enforce symbols
+            n = name.to_s.to_sym
+            # Only accept real column names
+            n if column_available?(n)
+          end
+        end.compact
+
         # Set to nil if equal to the default columns.
-        names = nil if names == default_columns
+        names = nil if names == default_columns || names.blank?
       end
       # Always write attribute and let validation do its magic.
       self[:columns] = names
