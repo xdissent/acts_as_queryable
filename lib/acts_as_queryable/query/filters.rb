@@ -4,7 +4,7 @@ module ActsAsQueryable::Query
   module Filters
     
     def filters
-      self[:filters] || {}
+      (self[:filters] || {}).symbolize_keys
     end
 
     # Public: Return the available query filters from either an instance 
@@ -88,7 +88,7 @@ module ActsAsQueryable::Query
       # check if name is defined as an available filter
       if filter_available?(name.to_sym)
         # TODO: check if operator is allowed for that filter
-        filters[name.to_sym] = {:operator => operator, :values => (values || ['']) }
+        self[:filters] = filters.merge(name.to_sym => {:operator => operator, :values => (values || [''])})
       end
     end
 
