@@ -10,6 +10,7 @@ module ActsAsQueryable::Patches
 
     module ClassMethods
       def queryable(klass=nil, filter_options={})
+        filter_options, klass = klass, nil if klass.is_a?(Hash)
         klass ||= name.sub("Controller", "").singularize.constantize
         return unless klass.queryable?
         write_inheritable_attribute :queryable, klass
