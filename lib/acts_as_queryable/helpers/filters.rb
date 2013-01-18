@@ -129,7 +129,7 @@ module ActsAsQueryable::Helpers
     def query_filter_add_options(query=nil)
       query ||= @query
       [[qt(:select_filter), ""]] + query.available_filters_sorted.map do |n, f| 
-        [query.filter_label_for(n), n] unless query.has_filter?(n)
+        [query.filter_label_for(n), n.to_s] unless query.has_filter?(n)
       end.compact
     end
   end

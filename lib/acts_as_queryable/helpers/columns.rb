@@ -28,7 +28,7 @@ module ActsAsQueryable::Helpers
 
     def query_columns_available_options(query=nil)
       query ||= @query
-      (query.available_columns.keys - query.columns).map { |n| [query.column_label_for(n), n] }
+      (query.available_columns.keys - query.columns).map { |n| [query.column_label_for(n), n.to_s] }
     end
 
     def query_columns_available_buttons
@@ -57,7 +57,7 @@ module ActsAsQueryable::Helpers
 
     def query_columns_selected_options(query=nil)
       query ||= @query
-      query.columns.map { |n| [query.column_label_for(n), n] }
+      query.columns.map { |n| [query.column_label_for(n), n.to_s] }
     end
 
     def query_columns_selected_buttons

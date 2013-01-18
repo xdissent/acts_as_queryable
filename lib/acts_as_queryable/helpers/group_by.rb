@@ -32,7 +32,7 @@ module ActsAsQueryable::Helpers
     def query_group_by_select(query=nil)
       query ||= @query
       select_tag "group_by", 
-        options_for_select(query_group_by_options(query), query.group_by)
+        options_for_select(query_group_by_options(query), query.group_by.to_s)
     end
 
     # Public: Build a selection of columns available to group_by.
@@ -42,7 +42,7 @@ module ActsAsQueryable::Helpers
     # Returns the select tag as a String.
     def query_group_by_options(query=nil)
       query ||= @query
-      [["", ""]] + query.groupable_columns.map { |c| [query.column_label_for(c), c] }
+      [["", ""]] + query.groupable_columns.map { |c| [query.column_label_for(c), c.to_s] }
     end
   end
 end
