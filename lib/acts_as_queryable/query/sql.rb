@@ -2,6 +2,10 @@
 
 module ActsAsQueryable::Query
   module Sql
+
+    def include_for(name)
+      name if self.queryable_class.reflect_on_all_associations.map(&:name).include?(name)
+    end
   
     # Public: Generate a conditional SQL clause for each given filter.
     #
@@ -14,8 +18,6 @@ module ActsAsQueryable::Query
     # Public: Run the query and return the items.
     #
     # options - The options to pass to queryable_class.find:
-    #           :include    - Associations to include in the query as an Array.
-    #                         Defaults to selected columns with associations.
     #           :conditions - Additional conditions for the query.
     #           :order      - Order clause as a String or Array of Strings. 
     #                         The default is derived from sort_criteria. A
@@ -23,17 +25,33 @@ module ActsAsQueryable::Query
     #                         is grouped.
     #           :limit      - The query result limit as an integer or nil.
     #           :offset     - The query result offset as an integer or nil.
-    #           :joins      - Additional joined tables for the query.
+    #           :include    - Additional associations for the query. Defaults to 
+    #                         any sort_criteria columns that are associations on
+    #                         the queryable model, as well as the group_by column
+    #                         if it is an association and the query is grouped.
     #
     # Returns an Array of results for the query.
     # Raises ActsAsQueryable::Query::StatementInvalid if the query is invalid.
     def items(options={})
       order = [group_by_sort_clause, sort_criteria_clause, options[:order]]
+      order = order.flatten.reject(&:blank?).compact.uniq.join(",")
+      order = nil if order.blank?
+      
+      includes = [options[:include], sort_criteria.map { |n, o| include_for(n) }]
+      includes << include_for(group_by) if grouped? && include_for(group_by)
+      includes = includes.flatten.reject(&:blank?).compact.uniq
+      includes = nil if includes.blank?
+
       queryable_class.all options.merge(
         :conditions => self.class.merge_conditions(to_sql, options[:conditions]),
-        :order => order.reject(&:blank?).compact)
+        :order => order,
+        :include => includes)
     rescue ::ActiveRecord::StatementInvalid => e
       raise StatementInvalid.new(e.message)
+    end
+
+    def items_by_group(options={})
+      items(options).inject({}) { |h, item| h[item.try(group_by)] ||= []; h[item.try(group_by)] << item; h }
     end
 
     def count(options={})
@@ -47,12 +65,11 @@ module ActsAsQueryable::Query
       return {nil => count(options)} unless grouped?
       begin
         # Rails will raise an (unexpected) RecordNotFound if there's only a nil group value
-        r = queryable_class.count options.merge(:group => group_by_clause,
+        queryable_class.count options.merge(:group => group_by_clause,
           :conditions => self.class.merge_conditions(to_sql, options[:conditions]))
       rescue ActiveRecord::RecordNotFound
-        r = {nil => count(options)}
+        {nil => count(options)}
       end
-      r
     rescue ::ActiveRecord::StatementInvalid => e
       raise StatementInvalid.new(e.message)
     end
@@ -64,16 +81,24 @@ module ActsAsQueryable::Query
       groupable
     end
 
+    # Public: Returns a sort clause derived from the group_by column. The
+    # order is pulled from available_columns and defaults to ascending.
+    #
+    # Returns a String SQL clause.
     def group_by_sort_clause
       return nil unless grouped?
       order_clause group_by, 
-        (default_order_for(group_by) || 'asc'), 
+        (default_order_for(group_by) || :asc), 
         (sortable_for(group_by) || true)
     end
 
+    # Public: Returns a sort clause derived from the sort_criteria. The
+    # group_by column is always removed, since it will be handled separately.
+    #
+    # Returns a String SQL clause.
     def sort_criteria_clause
       return nil unless sort_criteria.present?
-      sort_criteria.map { |name, order| order_clause name, order }.reject(&:blank?).join(',')
+      sort_criteria.map { |name, order| order_clause(name, order) if name != group_by }.reject(&:blank?).join(',')
     end
 
     def order_clause(name, order, sortable=nil)
