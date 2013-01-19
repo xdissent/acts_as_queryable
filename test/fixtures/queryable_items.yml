@@ -1,0 +1,140 @@
+queryable_item_1:
+  category_id: 1
+  user_id: 1
+  name: enim ad minim veniam
+  description: Lorem ipsum dolor sit amet
+  created_at: 2006-07-19 21:07:27 +02:00
+  updated_at: 2007-07-19 21:07:27 +02:00
+  due: 2013-07-19 21:07:27 +02:00
+  quantity: 145
+  approved: false
+queryable_item_2:
+  category_id: 1
+  user_id: 2
+  name: labore et dolore magna
+  description: exercitation ullamco laboris nis
+  created_at: 2007-07-19 21:07:27 +02:00
+  updated_at: 2008-07-19 21:07:27 +02:00
+  due: 2013-03-19 21:07:27 +02:00
+  quantity: 34
+  approved: true
+queryable_item_3:
+  category_id: 1
+  user_id: 1
+  name: ut labore et dolore
+  description: Excepteur sint occaecat
+  created_at: 2008-07-19 21:07:27 +02:00
+  updated_at: 2009-07-19 21:07:27 +02:00
+  due: 2013-11-19 21:07:27 +02:00
+  quantity: 85
+  approved: true
+queryable_item_4:
+  category_id: 1
+  user_id: 2
+  name: ullamco laboris nisi
+  description: laboris nisi ut aliquip
+  created_at: 2009-07-19 21:07:27 +02:00
+  updated_at: 2010-07-19 21:07:27 +02:00
+  due: 2013-02-19 21:07:27 +02:00
+  quantity: 153
+  approved: true
+queryable_item_5:
+  category_id: 2
+  user_id: 3
+  name: fugiat pariatur nulla
+  description: Duis aute irure dolor
+  created_at: 2010-07-19 21:07:27 +02:00
+  updated_at: 2011-07-19 21:07:27 +02:00
+  due: 2013-06-19 21:07:27 +02:00
+  quantity: 0
+  approved: true
+queryable_item_6:
+  category_id: 2
+  user_id: 2
+  name: adipisicing elit consectetur
+  description: incididunt ut labore et dolore magna aliqua
+  created_at: 2011-07-19 21:07:27 +02:00
+  updated_at: 2012-07-19 21:07:27 +02:00
+  due: 2013-05-19 21:07:27 +02:00
+  quantity: 5
+  approved: false
+queryable_item_7:
+  category_id: 1
+  user_id: 1
+  name: excepteur sint
+  description:  pariatur excepteur sint
+  created_at: 2001-05-19 21:07:27 +02:00
+  updated_at: 2003-07-19 21:07:27 +02:00
+  due: 2013-08-19 21:07:27 +02:00
+  quantity: 19
+  approved: true
+queryable_item_8:
+  category_id: 1
+  user_id: 1
+  name: veniam enim ad minim
+  description: Lorem ipsum dolor sit amet
+  created_at: 2006-05-19 21:07:27 +02:00
+  updated_at: 2007-07-19 21:07:27 +02:00
+  due: 2014-03-19 21:07:27 +02:00
+  quantity: 15
+  approved: true
+queryable_item_9:
+  category_id: 2
+  user_id: 2
+  name: labore et dolore magna
+  description: exercitation ullamco laboris nis
+  created_at: 2007-05-19 21:07:27 +02:00
+  updated_at: 2008-07-19 21:07:27 +02:00
+  due: 2014-01-19 21:07:27 +02:00
+  quantity: 10
+  approved: false
+queryable_item_10:
+  category_id: 1
+  user_id: 1
+  name: dolore ut labore et
+  description: Excepteur sint occaecat
+  created_at: 2008-05-19 21:07:27 +02:00
+  updated_at: 2009-07-19 21:07:27 +02:00
+  due: 2013-12-19 21:07:27 +02:00
+  quantity: 4
+  approved: true
+queryable_item_11:
+  category_id: ~
+  user_id: 2
+  name: nisi ullamco laboris
+  description: laboris nisi ut aliquip
+  created_at: 2009-05-19 21:07:27 +02:00
+  updated_at: 2010-07-19 21:07:27 +02:00
+  due: 2014-11-19 21:07:27 +02:00
+  quantity: 100
+  approved: true
+queryable_item_12:
+  category_id: ~
+  user_id: 3
+  name: nulla fugiat pariatur
+  description: Duis aute irure dolor
+  created_at: 2010-05-19 21:07:27 +02:00
+  updated_at: 2011-07-19 21:07:27 +02:00
+  due: 2014-02-19 21:07:27 +02:00
+  quantity: 0
+  approved: false
+queryable_item_13:
+  category_id: ~
+  user_id: 2
+  name: elit consectetur adipisicing
+  description: incididunt ut labore et dolore magna aliqua
+  created_at: 2011-05-19 21:07:27 +02:00
+  updated_at: 2012-07-19 21:07:27 +02:00
+  due: ~
+  quantity: 1
+  approved: true
+queryable_item_14:
+  category_id: ~
+  user_id: 1
+  name: excepteur sint pariatur
+  description:  pariatur excepteur sint
+  created_at: 2001-05-19 21:07:27 +02:00
+  updated_at: 2003-07-19 21:07:27 +02:00
+  due: ~
+  quantity: 10
+  approved: false

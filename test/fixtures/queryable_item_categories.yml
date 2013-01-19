@@ -1,0 +1,12 @@
+queryable_item_category_1:
+  id: 1
+  name: deserunt
+  item_count: 7
+queryable_item_category_2:
+  id: 2
+  name: cupidatat
+  item_count: 3
+queryable_item_category_3:
+  id: 3
+  name: occaecat
+  item_count: 0

@@ -1,0 +1,15 @@
+queryable_item_user_1:
+  id: 1
+  first_name: Lorem
+  last_name: Ipsum
+  active: true
+queryable_item_user_2:
+  id: 2
+  first_name: Excepteur
+  last_name: Sint
+  active: true
+queryable_item_user_3:
+  id: 3
+  first_name: Occaecat
+  last_name: Dupidatat
+  active: true

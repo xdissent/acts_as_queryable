@@ -1,121 +1,47 @@
 # encoding: utf-8
 
 require File.dirname(__FILE__) + '/../test_helper'
-require 'pry'
+require File.dirname(__FILE__) + '/schema'
 
 class QueryableQueryTest < ActiveSupport::TestCase
+  fixtures :queryable_queries, :queryable_item_users, :queryable_item_categories, :queryable_items
+  
   def setup
-    @columns = {
-      :name => {:sortable => true, :default_order => "asc"},
-      :category => {:sortable => true, :groupable => true}
-    }
-    @filters = {
-      :name => {:type => :string, :order => 1},
-      :category => {:type => :list, :order => 2},
-      :invisible => {:if => lambda { |q| false }},
-      :visible => {:if => lambda { |q| true }},
-      :choices => {:type => :list, :choices => [1, 2, 3]},
-      :dyn_choices => {:type => :list, :choices => lambda { |q| [q.name, Date.today] }}
-    }
-
-    Object.const_set :Foo, Class.new(ActiveRecord::Base)
-    Foo.acts_as_queryable :columns => @columns, :filters => @filters
-    @query = FooQuery.new :name => "_"
+    @query = QueryableItemQuery.new :name => "_"
   end
 
-  def teardown
-    Object.send :remove_const, :Foo
-    Object.send :remove_const, :FooQuery
-  end
+  context "a query" do
 
-  context "a query's available columns" do
-    should "be available as a hash attribute on the query class" do
-      assert_equal @columns, @query.available_columns
-    end
-  end
-
-  context "a query's available filters" do
-    should "evaluate conditionals" do
-      assert @query.filter_available?(:visible)
-      assert !@query.filter_available?(:invisible)
+    context "with no filters" do
+      should "return all items" do
+        assert_equal @query.items.map(&:id).sort, QueryableItem.all.map(&:id).sort
+      end
     end
 
-    should "evaluate choices" do
-      assert_equal [1, 2, 3], @query.choices_for(:choices)
-      assert_equal ["_", Date.today], @query.choices_for(:dyn_choices)
+    context "counts" do
+      should "match the results length" do
+        assert_equal @query.items.size, @query.count
+      end
+
+      should "be a Hash keyed by group column value if grouped" do
+        counts = {}
+        @query.group_by = @query.groupable_columns.first
+        @query.items.each do |item|
+          v = item.send @query.group_by
+          counts[v] = (counts[v] || 0) + 1
+        end
+
+        q_counts = @query.count_by_group
+        assert @query.grouped?, "Query is grouped."
+        assert_equal counts.keys.map { |k| k ? k.id : 0}.sort, q_counts.keys.map { |k| k ? k.id : 0 }.sort, "Count group keys must match"
+        assert_equal counts.values.sort, q_counts.values.sort, "Count group values must match"
+
+        @query.group_by = nil
+        counts = Hash[[counts.reduce { |a,b| [nil, b[1] + a[1]] }]]
+        assert !@query.grouped?, "Query is not grouped."
+        assert_equal counts, @query.count_by_group
+      end
     end
+
   end
-
-  # fixtures :projects, :users, :queryable_queries
-
-  # context "a query" do
-  #   should "return all widgets" do
-  #     query = WidgetQuery.new :name => "_"
-  #     widget_ids = query.query.collect(&:id)
-
-  #     assert widget_ids.include?(1)
-  #     assert widget_ids.include?(2)
-  #     assert widget_ids.include?(3)
-  #     assert widget_ids.include?(4)
-  #     assert widget_ids.include?(5)
-  #     assert widget_ids.include?(6)
-  #     assert widget_ids.include?(7)
-  #   end
-
-  #   should "return widgets filtered on name equals" do
-  #     query = WidgetQuery.new :name => "_", 
-  #       :filters => {'name' => {:operator => "=", :values => [widgets(:widget_4).name]}}
-  #     widget_ids = query.query.collect(&:id)
-
-  #     assert !widget_ids.include?(1)
-  #     assert !widget_ids.include?(2)
-  #     assert !widget_ids.include?(3)
-  #     assert widget_ids.include?(4)
-  #     assert !widget_ids.include?(5)
-  #     assert !widget_ids.include?(6)
-  #     assert !widget_ids.include?(7)
-  #   end
-
-  #   should "return widgets filtered on name not equals" do
-  #     query = WidgetQuery.new :name => "_", 
-  #       :filters => {'name' => {:operator => "!", :values => [widgets(:widget_4).name]}}
-  #     widget_ids = query.query.collect(&:id)
-
-  #     assert widget_ids.include?(1)
-  #     assert widget_ids.include?(2)
-  #     assert widget_ids.include?(3)
-  #     assert !widget_ids.include?(4)
-  #     assert widget_ids.include?(5)
-  #     assert widget_ids.include?(6)
-  #     assert widget_ids.include?(7)
-  #   end
-
-  #   should "return widgets filtered on name contains" do
-  #     query = WidgetQuery.new :name => "_", 
-  #       :filters => {'name' => {:operator => "~", :values => ["pariatur"]}}
-  #     widget_ids = query.query.collect(&:id)
-
-  #     assert !widget_ids.include?(1)
-  #     assert !widget_ids.include?(2)
-  #     assert !widget_ids.include?(3)
-  #     assert !widget_ids.include?(4)
-  #     assert widget_ids.include?(5)
-  #     assert !widget_ids.include?(6)
-  #     assert !widget_ids.include?(7)
-  #   end
-
-  #   should "return widgets filtered on name not contains" do
-  #     query = WidgetQuery.new :name => "_", 
-  #       :filters => {'name' => {:operator => "!~", :values => ["pariatur"]}}
-  #     widget_ids = query.query.collect(&:id)
-
-  #     assert widget_ids.include?(1)
-  #     assert widget_ids.include?(2)
-  #     assert widget_ids.include?(3)
-  #     assert widget_ids.include?(4)
-  #     assert !widget_ids.include?(5)
-  #     assert widget_ids.include?(6)
-  #     assert widget_ids.include?(7)
-  #   end
-  # end
 end

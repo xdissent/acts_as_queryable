@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-class CreateQueryItems < ActiveRecord::Migration
+class CreateQueryableItems < ActiveRecord::Migration
   def self.up
-    create_table :query_items, :force => true do |t|
+    create_table :queryable_items, :force => true do |t|
       t.integer :category_id
       t.integer :user_id, :null => false
       t.string :name
@@ -15,27 +15,26 @@ class CreateQueryItems < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :query_items
+    drop_table :queryable_items
   end
-end.up
+end
 
-class CreateQueryItemCategories < ActiveRecord::Migration
+class CreateQueryableItemCategories < ActiveRecord::Migration
   def self.up
-    create_table :query_item_categories, :force => true do |t|
+    create_table :queryable_item_categories, :force => true do |t|
       t.string :name
-      t.text :description
-      t.integer :category_count, :default => 0
+      t.integer :item_count, :default => 0
     end
   end
 
   def self.down
-    drop_table :query_item_categories
+    drop_table :queryable_item_categories
   end
-end.up
+end
 
-class CreateQueryItemUsers < ActiveRecord::Migration
+class CreateQueryableItemUsers < ActiveRecord::Migration
   def self.up
-    create_table :query_item_users, :force => true do |t|
+    create_table :queryable_item_users, :force => true do |t|
       t.string :first_name
       t.string :last_name
       t.boolean :active, :default => true
@@ -43,27 +42,27 @@ class CreateQueryItemUsers < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :query_item_users
+    drop_table :queryable_item_users
   end
-end.up
-
-class QueryItemCategory < ActiveRecord::Base
-  has_many :items, :class_name => "QueryItem"
 end
 
-class QueryItemUser < ActiveRecord::Base
-  has_many :items, :class_name => "QueryItem"
+class QueryableItemCategory < ActiveRecord::Base
+  has_many :items, :class_name => "QueryableItem"
 end
 
-class QueryItem < ActiveRecord::Base
-  belongs_to :category, :class_name => "QueryItemCategory", :counter_cache => true
-  belongs_to :user, :class_name => "QueryItemUser"
+class QueryableItemUser < ActiveRecord::Base
+  has_many :items, :class_name => "QueryableItem"
+end
+
+class QueryableItem < ActiveRecord::Base
+  belongs_to :category, :class_name => "QueryableItemCategory", :counter_cache => :item_count
+  belongs_to :user, :class_name => "QueryableItemUser"
 
   validates_presence_of :user
 
   acts_as_queryable :columns => {
-    :category => {:sortable => "#{QueryItemCategory.table_name}.category_count", :groupable => true, :default_order => 'desc'}
-    :user => {:sortable => ["#{QueryItemUser.table_name}.last_name", "#{QueryItemUser.table_name}.first_name", "#{QueryItemUser.table_name}.id"]},
+    :category => {:sortable => "#{QueryableItemCategory.table_name}.item_count", :groupable => true, :default_order => 'desc'},
+    :user => {:sortable => ["#{QueryableItemUser.table_name}.last_name", "#{QueryableItemUser.table_name}.first_name", "#{QueryableItemUser.table_name}.id"]},
     :description => {},
     :quantity => {:sortable => true, :default_order => 'desc', :label => "#"},
     :approved => {:groupable => true},
@@ -71,13 +70,17 @@ class QueryItem < ActiveRecord::Base
     :created_at => {:sortable => true, :default_order => 'desc'},
     :updated_at => {:sortable => true, :default_order => 'desc'}
   }, :filters => {
-    :category_id => {:type => :list_optional, :order => 1, :choices => lambda { |q| QueryItemCategory.all }, :if => lambda { |q| QueryItemCategory.all.present? }},
-    :user_id => {:type => :list, :order => 2, :choices => lambda { |q| QueryItemUser.all }},
+    :category_id => {:type => :list_optional, :order => 1, :choices => lambda { |q| QueryableItemCategory.all.map(&:id).map(&:to_s) }, :if => lambda { |q| QueryableItemCategory.all.present? }},
+    :user_id => {:type => :list, :order => 2, :choices => lambda { |q| QueryableItemUser.all.map(&:id).map(&:to_s) }},
     :description => {:type => :text, :order => 3},
-    :quantity => {:type => :integer, :order => 4, :label => "Number Available"}
+    :quantity => {:type => :integer, :order => 4, :label => "Number Available"},
     :approved => {:type => :boolean, :order => 5},
     :due => {:type => :date, :order => 6},
     :created_at => {:type => :date_past, :order => 7},
     :updated_at => {:type => :date_past, :order => 8}
   }
 end
+
+CreateQueryableItems.up
+CreateQueryableItemCategories.up
+CreateQueryableItemUsers.up
