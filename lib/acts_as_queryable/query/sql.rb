@@ -3,27 +3,42 @@
 module ActsAsQueryable::Query
   module Sql
   
+    # Public: Generate a conditional SQL clause for each given filter.
+    #
+    # Returns the SQL as a string.
     def to_sql
       return nil unless filters.present? and valid?
-      filters.map { |n, f| sql_for(n) }.reject { |s| s.blank? }.join(' AND ')
+      filters.map { |n, f| sql_for(n) }.reject(&:blank?).join(' AND ')
     end
 
-    def query(options={})
-      order_option = [group_by_sort_clause, sort_criteria_clause, options[:order]].reject { |s| s.blank? }.join(',')
-      order_option = nil if order_option.blank?
-      queryable_class.find :all, 
-        :include => (options[:include] || []),
+    # Public: Run the query and return the items.
+    #
+    # options - The options to pass to queryable_class.find:
+    #           :include    - Associations to include in the query as an Array.
+    #                         Defaults to selected columns with associations.
+    #           :conditions - Additional conditions for the query.
+    #           :order      - Order clause as a String or Array of Strings. 
+    #                         The default is derived from sort_criteria. A
+    #                         group_by clause is always prepended if the query
+    #                         is grouped.
+    #           :limit      - The query result limit as an integer or nil.
+    #           :offset     - The query result offset as an integer or nil.
+    #           :joins      - Additional joined tables for the query.
+    #
+    # Returns an Array of results for the query.
+    # Raises ActsAsQueryable::Query::StatementInvalid if the query is invalid.
+    def items(options={})
+      order = [group_by_sort_clause, sort_criteria_clause, options[:order]]
+      queryable_class.all options.merge(
         :conditions => self.class.merge_conditions(to_sql, options[:conditions]),
-        :order => order_option,
-        :limit => options[:limit],
-        :offset => options[:offset]
+        :order => order.reject(&:blank?).compact)
     rescue ::ActiveRecord::StatementInvalid => e
       raise StatementInvalid.new(e.message)
     end
 
     def count(options={})
-      queryable_class.count :include => (options[:include] || []), 
-        :conditions => self.class.merge_conditions(to_sql, options[:conditions])
+      queryable_class.count options.merge(
+        :conditions => self.class.merge_conditions(to_sql, options[:conditions]))
     rescue ::ActiveRecord::StatementInvalid => e
       raise StatementInvalid.new(e.message)
     end
@@ -32,9 +47,8 @@ module ActsAsQueryable::Query
       return {nil => count(options)} unless grouped?
       begin
         # Rails will raise an (unexpected) RecordNotFound if there's only a nil group value
-        r = queryable_class.count :group => group_by_clause, 
-          :include => (options[:include] || [group_by]), 
-          :conditions => self.class.merge_conditions(to_sql, options[:conditions])
+        r = queryable_class.count options.merge(:group => group_by_clause,
+          :conditions => self.class.merge_conditions(to_sql, options[:conditions]))
       rescue ActiveRecord::RecordNotFound
         r = {nil => count(options)}
       end
@@ -52,25 +66,25 @@ module ActsAsQueryable::Query
 
     def group_by_sort_clause
       return nil unless grouped?
-      order_clause group_by, (default_order_for(group_by) || 'asc')
+      order_clause group_by, 
+        (default_order_for(group_by) || 'asc'), 
+        (sortable_for(group_by) || true)
     end
 
     def sort_criteria_clause
       return nil unless sort_criteria.present?
-      sort_criteria.reverse.map { |name, order| order_clause name, order }.reject { |s| s.blank? }.join(',')
+      sort_criteria.map { |name, order| order_clause name, order }.reject(&:blank?).join(',')
     end
 
-    def order_clause(name, order)
+    def order_clause(name, order, sortable=nil)
       # Translate name to sortable (true, String table name and field, or array of table names and fields)
-      sortable = sortable_for(name)
-      # Force valid sortable value for group_by.
-      sortable ||= true if group_by == name
+      sortable ||= sortable_for(name)
       # Bail if we don't have anything to sort on.
       return nil unless sortable
       # Translate true into field name column the the queryable class table.
       sortable = "#{self.queryable_class.table_name}.#{name}" if sortable == true
       # Force to array and join
-      Array(sortable).map { |s| "#{s} #{order}" }.reject { |s| s.blank? }.join(',')
+      Array(sortable).map { |s| "#{s} #{order}" }.reject(&:blank?).join(',')
     end
 
     # Returns a SQL clause for a date or datetime field.
