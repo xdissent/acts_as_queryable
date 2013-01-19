@@ -32,7 +32,7 @@ module ActsAsQueryable::Helpers
     def query_sort_criteria_attribute_select(index=0, query=nil)
       query ||= @query
       select_tag("query[sort_criteria][#{index}][]",
-        options_for_select(query_sort_criteria_attribute_options(query), query.sort_criteria_key(index).to_s),
+        options_for_select(query_sort_criteria_attribute_options(query), query.sort_criteria[index].to_s),
         :id => "query_sort_criteria_attribute_#{index}")
     end
 
@@ -54,7 +54,7 @@ module ActsAsQueryable::Helpers
     def query_sort_criteria_direction_select(index=0, query=nil)
       query ||= @query
       select_tag("query[sort_criteria][#{index}][]",
-        options_for_select(query_sort_criteria_direction_options(query), @query.sort_criteria_order(index).to_s),
+        options_for_select(query_sort_criteria_direction_options(query), @query.sort_criteria[index].to_s),
         :id => "query_sort_criteria_direction_#{index}")
     end
 
