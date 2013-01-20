@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 module ActsAsQueryable::Helpers
-  module Sort
+  module SortCriteria
 
     # Public: Build a sort criteria widget the query.
     #

@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 module ActsAsQueryable::Query
-  module Sort
+  module SortCriteria
 
     def sort_criteria
       self[:sort_criteria] || []

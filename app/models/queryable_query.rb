@@ -7,7 +7,7 @@ class QueryableQuery < ActiveRecord::Base
   include ActsAsQueryable::Query::Columns
   include ActsAsQueryable::Query::Operators
   include ActsAsQueryable::Query::GroupBy
-  include ActsAsQueryable::Query::Sort
+  include ActsAsQueryable::Query::SortCriteria
   include ActsAsQueryable::Query::Sql
   include ActsAsQueryable::Query::Validation
 
