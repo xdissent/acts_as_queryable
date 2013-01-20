@@ -33,6 +33,14 @@ module QueryableHelper
   def find_query_by_id_conditions
   end
 
+  # Public: Instantiates a new query for use in the find_by helpers.
+  #
+  # Returns a new query instance.
+  def find_query_new(attrs={})
+    find_query_class
+    @query_class.new({:name => "_"}.merge attrs)
+  end
+
   # Public: Find a saved query by id and sets the @query instance variable.
   # The conditions for the find are taken from find_query_by_id_conditions.
   # The query id is stored in the session if found.
@@ -56,7 +64,7 @@ module QueryableHelper
     attrs = session[query_session_key].present? ? session[query_session_key].dup : {}
     @query = @query_class.find_by_id(attrs[:id], :conditions => find_query_by_id_conditions) if attrs[:id]
     attrs.delete :id
-    @query ||= @query_class.new(attrs.merge :name => "_")
+    @query ||= find_query_new
   end
 
   # Public: Build a query from params. A new query is instantiated with
@@ -65,7 +73,7 @@ module QueryableHelper
   # Returns nothing.
   def find_query_by_params
     find_query_class
-    @query = @query_class.new :name => "_"
+    @query = find_query_new
     if params[:fields] || params[:f]
       @query.filters = {}
       @query.add_filters(params[:fields] || params[:f], params[:operators] || params[:op], params[:values] || params[:v])
