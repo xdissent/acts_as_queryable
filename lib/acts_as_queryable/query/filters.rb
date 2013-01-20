@@ -12,7 +12,7 @@ module ActsAsQueryable::Query
     #
     # Returns the available filters as a Hash.
     def available_filters
-      eval_class_filters
+      @available_filters ||= eval_class_filters
     end
 
     # Public: Evaluate conditionals and dynamic values in filter definitions.
