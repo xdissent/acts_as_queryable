@@ -39,21 +39,21 @@ module QueryableHelper
   # Returns nothing.
   def find_query_by_id
     find_query_class
-    @query = @query_class.find_by_id params[:query_id], :conditions => find_query_conditions
+    @query = @query_class.find_by_id params[:query_id], :conditions => find_query_by_id_conditions
     return unless @query
     session[query_session_key] = {:id => @query.id}
   end
 
   # Public: Find a query in the session. First looks for a query by id if
   # an id is in the session. If a query with that id is not found (using 
-  # find_query_conditions) a new query is instantiated with the rest of the 
+  # find_query_by_id_conditions) a new query is instantiated with the rest of the 
   # attributes from the session, if any.
   #
   # Returns nothing.
   def find_query_by_session
     find_query_class
     attrs = session[query_session_key].present? ? session[query_session_key].dup : {}
-    @query = @query_class.find_by_id(attrs[:id], :conditions => find_query_conditions) if attrs[:id]
+    @query = @query_class.find_by_id(attrs[:id], :conditions => find_query_by_id_conditions) if attrs[:id]
     attrs.delete :id
     @query ||= @query_class.new(attrs.merge :name => "_")
   end
