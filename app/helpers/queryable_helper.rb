@@ -15,6 +15,7 @@ module QueryableHelper
   #
   # Returns nothing.
   def find_query
+    find_query_class
     if params[:query_id].present?
       find_query_by_id
     else
