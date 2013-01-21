@@ -94,7 +94,7 @@ module QueryableHelper
   #
   # Returns nothing.
   def find_query_class
-    @queryable_class ||= self.class.read_inheritable_attribute :queryable
+    @queryable_class ||= self.class.queryable
     return unless @queryable_class && @queryable_class.queryable?
     @query_class ||= @queryable_class.query_class
     return unless @query_class

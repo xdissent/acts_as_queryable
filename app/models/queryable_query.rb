@@ -20,9 +20,13 @@ class QueryableQuery < ActiveRecord::Base
   validate :validate_filters, :validate_columns, :validate_group_by
 
   # Queryable class/instance accessors
-  class_inheritable_accessor :queryable_class
-  class_inheritable_hash_writer :operators_by_filter_type, :available_columns, :available_filters, :operators
-  # attr_writer :queryable_class, :operators_by_filter_type, :available_columns, :available_filters, :operators
+  if Rails.version.to_i < 3
+    class_inheritable_accessor :queryable_class
+    class_inheritable_hash_writer :operators_by_filter_type, :available_columns, :available_filters, :operators
+  else
+    class_attribute :queryable_class
+    cattr_writer :operators_by_filter_type, :available_columns, :available_filters, :operators
+  end
 
   # Default operators
   self.operators = {

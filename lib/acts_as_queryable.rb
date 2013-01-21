@@ -17,12 +17,23 @@ module ActsAsQueryable
     return if queryable?
     
     # Store queryable options as Hash on queryable model class.
-    class_inheritable_hash :queryable_options
+    if Rails.version.to_i < 3
+      class_inheritable_hash :queryable_options
+    else
+      class_attribute :queryable_options
+    end
     self.queryable_options = options
 
     # Add queryable methods to model.
     extend ClassMethods
     include InstanceMethods
+
+    if Rails.version.to_i > 2 # dup class attrs so they're inherited correctly
+      query_class.available_columns = query_class.available_columns.dup
+      query_class.available_filters = query_class.available_filters.dup
+      query_class.operators = query_class.operators.dup
+      query_class.operators_by_filter_type = query_class.operators_by_filter_type.dup
+    end
 
     # Set up the query class.
     query_class.queryable_class = self
