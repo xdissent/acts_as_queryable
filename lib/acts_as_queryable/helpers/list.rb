@@ -57,6 +57,8 @@ module ActsAsQueryable::Helpers
         qt(:yes)
       when "FalseClass"
         qt(:no)
+      when "Array"
+        value.map { |v| query_list_item_value_content(v, name, item, query) }.join ","
       else
         h(value.to_s)
       end
