@@ -59,6 +59,8 @@ module ActsAsQueryable::Helpers
         qt(:no)
       when "Array"
         value.map { |v| query_list_item_value_content(v, name, item, query) }.join ","
+      when "String"
+        auto_link(h(value))
       else
         h(value.to_s)
       end
